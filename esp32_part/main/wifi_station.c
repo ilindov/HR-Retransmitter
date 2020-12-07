@@ -70,11 +70,63 @@ void wifi_init_sta(void)
             .password = EXAMPLE_ESP_WIFI_PASS
         },
     };
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config) );
+
+    wifi_ant_config_t ant_config;
+    ESP_ERROR_CHECK(esp_wifi_get_ant(&ant_config));
+    ESP_LOGI(TAG, "rx_ant_mode: %d, tx_ant_mode: %d, rx_ant_default: %d, enabled_ant0: %d, enabled_ant1: %d", 
+            ant_config.rx_ant_mode, ant_config.tx_ant_mode, ant_config.rx_ant_default, ant_config.enabled_ant0, ant_config.enabled_ant1);
+    
+    wifi_ant_gpio_config_t ant_gpio_config;
+    ESP_ERROR_CHECK(esp_wifi_get_ant_gpio(&ant_gpio_config));
+
+    for (int i = 0; i <= 3; i++) {
+        ESP_LOGI(TAG, "I: %d, gpio_select: %d; gpio_num: %d",
+            i,
+            ant_gpio_config.gpio_cfg[i].gpio_select,
+            ant_gpio_config.gpio_cfg[i].gpio_num);
+    }
+
+        
+
+    /*{
+        .rx_ant_mode = WIFI_ANT_MODE_ANT0,
+        .tx_ant_mode = WIFI_ANT_MODE_ANT1,
+        .enabled_ant0 = 1,
+        .enabled_ant1 = 1;
+    };*/
+
+    // ESP_ERROR_CHECK(esp_wifi_set_ant());
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_set_protocol(ESP_IF_WIFI_STA, WIFI_PROTOCOL_11B));
+    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start() );
 
     ESP_LOGI(TAG, "WiFi_init_sta finished.");
+
+    wifi_country_t wifi_set_country = {
+        .cc = "BG",
+        .schan = 1,
+        .nchan = 13,
+        .policy = WIFI_COUNTRY_POLICY_MANUAL
+    };
+    ESP_ERROR_CHECK(esp_wifi_set_country(&wifi_set_country));
+
+
+    wifi_country_t wifi_country;
+    ESP_ERROR_CHECK(esp_wifi_get_country(&wifi_country));
+    ESP_LOGI(TAG, "Country: %s, max_tx_power: %d", wifi_country.cc, wifi_country.max_tx_power);
+
+    int8_t tx_power;
+    ESP_ERROR_CHECK(esp_wifi_get_max_tx_power(&tx_power));
+    ESP_LOGI(TAG, "Device  max_tx_power: %d", tx_power);
+
+    wifi_ps_type_t ps_type;
+    ESP_ERROR_CHECK(esp_wifi_get_ps(&ps_type));
+    ESP_LOGI(TAG, "Current PS: %d", ps_type);
+
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MAX_MODEM));
+    ESP_ERROR_CHECK(esp_wifi_get_ps(&ps_type));
+    ESP_LOGI(TAG, "Set PS: %d", ps_type);    
 
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */

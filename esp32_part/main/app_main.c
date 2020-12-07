@@ -1,8 +1,6 @@
 #include "driver/gpio.h"
 #include "nvs_flash.h"
 
-
-
 #define LED_GPIO GPIO_NUM_2
 
 esp_err_t start_rest_server(void);
@@ -22,8 +20,9 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    start_wifi();
-    ESP_ERROR_CHECK(start_rest_server());
-    start_ble();
     gpio_set_level(LED_GPIO, 0);
+
+    start_wifi();
+    start_ble();
+    ESP_ERROR_CHECK(start_rest_server());
 }

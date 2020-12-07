@@ -26,7 +26,7 @@ time_t prev_time = 0;
 static esp_err_t puthr_put_handler(httpd_req_t *req)
 {
     uint8_t hr = (uint8_t)atoi(strchr(req->uri, '?') + sizeof(char));
-    ESP_LOGI(REST_TAG, "HR: %d - %ld\n", hr, time(NULL) - prev_time);
+    // ESP_LOGI(REST_TAG, "HR: %d - %ld\n", hr, time(NULL) - prev_time);
     prev_time = time(NULL);
     update_hr(hr);
 

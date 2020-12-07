@@ -20,9 +20,8 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    gpio_set_level(LED_GPIO, 0);
-
     start_wifi();
     start_ble();
     ESP_ERROR_CHECK(start_rest_server());
+    gpio_set_level(LED_GPIO, 0);
 }
